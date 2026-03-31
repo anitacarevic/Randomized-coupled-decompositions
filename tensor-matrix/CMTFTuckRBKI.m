@@ -9,10 +9,21 @@ X1=tenmat1(X);
 %randomizacija
 [QX,~] = MyRBKI(X1, kX, qX);
 [QY,~] = MyRBKI(Y, kY, qY);
-[Q,~,~] = qr([QX QY], 0);
+[Q,R,E] = qr([QX QY], 0);
 
-XQ = Q'*X1;
-YQ = Q'*Y;
+Q = Q(:,E);
+
+tol = m*eps;
+rQ = kX*qX + kY*qY;
+for i = 1:(kX*qX + kY*qY)
+    if abs(R(i,i)) < tol
+        rQ = i-1;
+        break;
+    end
+end
+
+XQ = Q(:,1:rQ)'*X1;
+YQ = Q(:,1:rQ)'*Y;
 
 start = tic;
 [U,V,W]=cmf(XQ,YQ,k);
