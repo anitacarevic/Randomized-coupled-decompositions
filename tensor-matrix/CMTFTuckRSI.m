@@ -19,9 +19,20 @@ for i=1:q
     [Q2,~] = qr(Y*Omega2,0);
     Omega2 = Y'*Q2;
 end
-[Q,~,~] = qr([Q1 Q2],0);
-XQ = Q'*X1;
-YQ = Q'*Y;
+[Q,R,E] = qr([Q1 Q2],0);
+Q = Q(:,E);
+
+tol = m*eps;
+rQ = 2*k;
+for i = 1:2*k
+    if abs(R(i,i)) < tol
+        rQ = i-1;
+        break;
+    end
+end
+
+XQ = Q(:,1:rQ)'*X1;
+YQ = Q(:,1:rQ)'*Y;
 
 start = tic;
 [U,V,W]=cmf(XQ,YQ,k);
